@@ -117,7 +117,6 @@ def plot_comparison(state, county, start, end, plot="", path = DEATHS, title = "
     legend.append(tag2)
     ax_us.legend(legend)
 
-
     plt.show()
 
 
@@ -162,7 +161,7 @@ def extrapolate_info(state, county, start='', end='',path=CONFIRMED):
 # plot_state_county("Florida", "Miami-Dade"  , path=DEATHS ,title="Total", tag="Total Deaths")
 # plot_state_county("Florida", "Miami-Dade"  , path=CONFIRMED ,title="Total", tag="Total Confirmed")
 
-plot_comparison("Florida", "Miami-Dade", "10,16,2020", "10,28,2020", title="Miami Compared to the rest of US Counties as a Whole",tag="Miami")
+plot_comparison("Florida", "Miami-Dade", "10,16,2020", "10,22,2020", title="Miami Compared to the rest of US Counties as a Whole",tag="Miami")
 plot_comparison("Florida", "Miami-Dade", "10,16,2020", "10,28,2020", plot="Florida", title="Miami Compared to the rest of Florida Counties",tag="Miami", tag2="Florida")
 
 extrapolate_info("Florida", "Miami-Dade", start="5,1,2020", end="10,28,2020")
