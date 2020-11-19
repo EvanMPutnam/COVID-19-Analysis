@@ -10,25 +10,19 @@ END = datetime.date(2020, 10, 28)
 
 REMOVE_KEYS = ["UID","iso2","iso3","code3","FIPS","Admin2","Province_State","Country_Region","Lat","Long_","Combined_Key","Population"]
 
-def plot_state_county(state, county, path = DEATHS, title = "...", tag = 'cases'):
-    data = pandas.read_csv(path)
-    county_data = data[data.Province_State == state][data.Admin2 == county]
-    raw_data = county_data.transpose()
-    for key in REMOVE_KEYS:
-        try:
-            raw_data = raw_data.drop(key)
-        except:
-            print (key + " not in .csv")
-    raw_data.columns = [tag]
-    raw_data.plot()
-    plt.show()
 
-
-def plot_state_confirms(state, path = CONFIRMED, title = "Title", tag = 'Tag'):
+def plot_state_county(state, county="", path = DEATHS, title = "...", tag = 'cases'):
+    """
+    Plots out line graph of a state's county
+    If county is empty, plots out whole state's data instead
+    """
     data = pandas.read_csv(path)
-    state_data = data[data.Province_State == state]
+    if county == "":
+        graph_data = data[data.Province_State == state]
+    else:
+        graph_data = data[data.Province_State == state][data.Admin2 == county]
     legend = []
-    for index, row in state_data.iterrows():
+    for index, row in graph_data.iterrows():
         raw_data = row.transpose()
         for key in REMOVE_KEYS:
             try:
@@ -44,6 +38,10 @@ def plot_state_confirms(state, path = CONFIRMED, title = "Title", tag = 'Tag'):
 
 
 def plot_two_week(state, county="", path=CONFIRMED, title="Title", tag="Tag"):
+    """
+    Plots out bar graph of a state's county's confirmed/death data in biweekly intervals
+    If county is empty, plots out whole state's data instead
+    """
     # use isinstance(x, list) for array
     data = pandas.read_csv(path)
     data = data[data.Province_State == state]
@@ -61,9 +59,7 @@ def plot_two_week(state, county="", path=CONFIRMED, title="Title", tag="Tag"):
     data = data[two_week_list]
     if county == "":
         raw_data = data.transpose()
-        print(data.Admin2)
         raw_data = raw_data.drop("Admin2")
-        print(raw_data)
         # change this for full tags, probably wont be using this
         # raw_data.columns = [tags]
         ax = raw_data.plot.bar()
@@ -75,13 +71,15 @@ def plot_two_week(state, county="", path=CONFIRMED, title="Title", tag="Tag"):
                 raw_data = raw_data.drop(key)
             except:
                 print(key + " not in .csv")
-        print(raw_data)
         ax = raw_data.plot.bar()
         ax.legend([county])
     plt.show()
 
 
 def plot_comparison(state, county, start, end, plot="", path = DEATHS, title = "Title", tag="", tag2="US Counties"):
+    """
+    Plots a line chart comparing a county to US average given a time range
+    """
     start = start.split(',')
     end = end.split(',')
     start_date = datetime.date(int(start[2]), int(start[0]), int(start[1]))
@@ -109,8 +107,9 @@ def plot_comparison(state, county, start, end, plot="", path = DEATHS, title = "
     legend = []
 
     raw_data = miami_data.transpose()
-    ax = raw_data.plot()
+    ax = raw_data.plot(title="Number of COVID-19 Cases per Day in Miami-Dade")
     legend.append(tag)
+    ax.legend(legend)
 
     us_whole = data.mean(axis=0)
     ax_us = us_whole.plot(title=title)
@@ -121,6 +120,9 @@ def plot_comparison(state, county, start, end, plot="", path = DEATHS, title = "
 
 
 def extrapolate_info(state, county, start='', end='',path=CONFIRMED):
+    """
+    Used for analysis of state/county data, pandas analysis probably better
+    """
     start = start.split(',')
     end = end.split(',')
     start_date = datetime.date(int(start[2]), int(start[0]), int(start[1]))
@@ -152,86 +154,27 @@ def extrapolate_info(state, county, start='', end='',path=CONFIRMED):
         count+=1
 
 
-# plot_two_week("Florida")
-# plot_state_county("Pennsylvania", "Northampton", title = "Total Confirmed Cases Northampton, Pennsylvania", tag = "Total Deaths")
-# plot_state_county("Iowa", "Marion", title = "Total Confirmed Cases Marion, Iowa", tag = "Total Deaths")
-#
+# Use param path=DEATHS in these methods to switch graph displays to use death data instead, default is confirmed cases
 
+# Single County in Florida
+# plot_state_county("Florida", "Alachua"     , title="Total", tag="Total Deaths")
+
+# Florida comparison with all counties
+# plot_state_county("Florida", title="Total", tag="Total Deaths")
+
+# Plots bar graph of two week increments in Florida (very compacted and doesnt show well)
+# plot_two_week("Florida")
+
+# Plots bar graph of two week increments in Florida county
 # plot_two_week("Florida", county="Miami-Dade")
+
+# Plots a comparing line graph to the rest of the united states average given a state and county.
+# Date range required, delimited by commas
+# plot_comparison("Florida", "Miami-Dade", "10,30,2020", "11,5,2020")
+
+
 # plot_state_county("Florida", "Miami-Dade"  , path=DEATHS ,title="Total", tag="Total Deaths")
 # plot_state_county("Florida", "Miami-Dade"  , path=CONFIRMED ,title="Total", tag="Total Confirmed")
 
-plot_comparison("Florida", "Miami-Dade", "10,16,2020", "10,22,2020", title="Miami Compared to the rest of US Counties as a Whole",tag="Miami")
-plot_comparison("Florida", "Miami-Dade", "10,16,2020", "10,28,2020", plot="Florida", title="Miami Compared to the rest of Florida Counties",tag="Miami", tag2="Florida")
+# extrapolate_info("Florida", "Miami-Dade", start="5,1,2020", end="10,28,2020")
 
-extrapolate_info("Florida", "Miami-Dade", start="5,1,2020", end="10,28,2020")
-# plot_state_confirms("Florida", title="Florida Confirmed Cases")
-# plot_state_county("Florida", "Alachua"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Baker"       , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Bay"         , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Bradford"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Brevard"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Broward"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Calhoun"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Charlotte"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Citrus"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Clay"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Collier"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Columbia"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "DeSoto"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Dixie"       , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Duval"       , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Escambia"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Flagler"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Franklin"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Gadsden"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Gilchrist"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Glades"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Gulf"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Hamilton"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Hardee"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Hendry"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Hernando"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Highlands"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Hillsborough", title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Holmes"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Indian River", title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Jackson"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Jefferson"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Lafayette"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Lake"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Lee"         , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Leon"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Levy"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Liberty"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Madison"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Manatee"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Marion"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Martin"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Miami-Dade"  , path=DEATHS ,title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Monroe"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Nassau"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Okaloosa"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Okeechobee"  , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Orange"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Osceola"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Out of FL"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Palm Beach"  , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Pasco"       , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Pinellas"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Polk"        , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Putnam"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Santa Rosa"  , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Sarasota"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Seminole"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "St. Johns"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "St. Lucie"   , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Sumter"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Suwannee"    , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Taylor"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Unassigned"  , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Union"       , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Volusia"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Wakulla"     , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Walton"      , title="Total", tag="Total Deaths")
-# plot_state_county("Florida", "Washington"  , title="Total", tag="Total Deaths")

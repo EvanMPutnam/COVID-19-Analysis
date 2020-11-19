@@ -73,6 +73,8 @@ def plot_comparison(state, county, dayDict, path = DEATHS, type="line", title = 
         curr_date = datetime.datetime.strptime(date, "%b %d")
         list_to_plot.append(curr_date.strftime("%#m/%#d/") + "20")
 
+    date = datetime.datetime.strptime(list_to_plot[-1], "%m/%d/%y")
+
     postsNumber = []
     for date in objects:
         postsNumber.append(dayDict[date])
