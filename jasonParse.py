@@ -60,9 +60,9 @@ def createMixedChart(dayDict):
     plt.plot(list_to_plot,postsNumber)
 
     plt.xlabel("Date")
-    plt.ylabel("Number of Posts")
-    plt.title("Number of Public Posts Tagged with Miami Beach")
-    plt.legend(["Miami", "Instagram"])
+    plt.ylabel("Count")
+    plt.title("Number of Instagram Posts Compared with Miami COVID-CASES")
+    plt.legend(['Miami COVID-Cases', 'Number of Instagram Posts'])
     plt.show()
 
 
@@ -88,6 +88,7 @@ def plot_comparison(state, county, dayDict, path = DEATHS, type="line", title = 
     legend = []
 
     if type == "line":
+        # Combined graph will be shown in createMixedChart()
         raw_data = miami_data.transpose()
         ax = raw_data.plot()
         legend.append(tag)
@@ -95,9 +96,13 @@ def plot_comparison(state, county, dayDict, path = DEATHS, type="line", title = 
     else:
         raw_data = miami_data.transpose()
         raw_data["Instagram"] = postsNumber
-        raw_data.columns = ['Miami', 'Instagram']
+        raw_data.columns = ['Miami COVID-Cases', 'Number of Instagram Posts']
         ax = raw_data.plot.bar()
-    plt.show()
+        plt.xlabel("Date")
+        plt.ylabel("Count")
+        plt.title("Number of Instagram Posts Compared with Miami COVID Cases")
+        plt.show()
+
 
 
 for file in os.listdir('json_files'):
